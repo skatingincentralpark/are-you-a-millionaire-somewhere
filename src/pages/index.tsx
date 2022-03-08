@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { NextPage } from "next";
-import { GetStaticProps, InferGetStaticPropsType } from "next";
+import { GetStaticProps } from "next";
 import Head from "next/head";
 import NumberFormat from "react-number-format";
 import getSymbolFromCurrency from "currency-symbol-map";
@@ -8,6 +8,7 @@ import {
   getAllCountriesByCurrencyOrSymbol,
   getAllISOByCurrencyOrSymbol,
 } from "iso-country-currency";
+import { GetRatesResults } from "../types";
 
 import {
   FormControl,
@@ -29,13 +30,8 @@ import GradientText from "../components/GradientText";
 
 import CountriesMap from "../components/CountriesMap";
 
-interface Props {
-  rates: any;
-}
-
-// const Home: NextPage = ({rates}: InferGetStaticPropsType<typeof getStaticProps>) => {
-const Home: NextPage<Props> = ({ rates }) => {
-  console.log({ rates });
+const Home: NextPage = ({ results }: any) => {
+  // const Home: NextPage = () => {
   const [amount, setAmount] = useState(0);
   const [currency, setCurrency] = useState("AUD");
   const [currencies, setCurrencies] = useState(topCurrencies);
@@ -54,17 +50,22 @@ const Home: NextPage<Props> = ({ rates }) => {
     submitHandler();
   }, [currency]);
 
-  const entries = Object.entries(rates.rates);
+  const entries: [string, number][] = Object.entries(results?.rates);
   const allCurrencies = entries.map((x) => x[0]);
 
   const submitHandler = () => {
+    if (!entries || !results) return;
     const selectedCurrency = entries.find((c) => c[0] === currency);
     const usd = entries.find((c) => c[0] === "USD");
+
     if (!selectedCurrency || !usd) return;
-    const convertedToUsd = (usd[1] / selectedCurrency[1]) * amount;
+    const a: number = usd[1];
+    const b: number = selectedCurrency[1];
+
+    const convertedToUsd = (a / b) * amount;
 
     const filteredCurrencies = entries.filter(
-      (c) => (c[1] / usd[1]) * convertedToUsd > 1000000
+      (c) => (b / a) * convertedToUsd > 1000000
     );
     setFilteredCurrencies(filteredCurrencies);
   };
@@ -132,7 +133,9 @@ const Home: NextPage<Props> = ({ rates }) => {
           <Typography variant="h1" component="div" fontWeight="600">
             Where are you a <GradientText primary={"Millionaire?"} />
           </Typography>
-          <Typography variant="h2">Money conversion to check</Typography>
+          <Typography variant="h2">
+            Convert your money to see if it exceeds 1m in any country
+          </Typography>
         </Stack>
 
         <Stack
@@ -223,7 +226,7 @@ const Home: NextPage<Props> = ({ rates }) => {
                     <ListItemText
                       primary={
                         <Typography
-                          type="body1"
+                          variant="body1"
                           fontWeight="600"
                           style={{
                             color: "black",
@@ -268,11 +271,11 @@ export const getStaticProps: GetStaticProps = async () => {
   const res = await fetch(
     `http://api.exchangeratesapi.io/v1/latest?access_key=${process.env.NEXT_PUBLIC_EXCHANGE_API_KEY}`
   );
-  const rates = await res.json();
+  const results: GetRatesResults = await res.json();
 
   return {
     props: {
-      rates,
+      results,
     },
     // Next.js will attempt to re-generate the page:
     // - When a request comes in
