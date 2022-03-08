@@ -50,7 +50,7 @@ const Home: NextPage = ({ results }: any) => {
     submitHandler();
   }, [currency]);
 
-  const entries: [string, number][] = Object.entries(results?.rates);
+  const entries: [string,number][] = Object.entries(results?.rates);
   const allCurrencies = entries.map((x) => x[0]);
 
   const submitHandler = () => {
@@ -59,15 +59,15 @@ const Home: NextPage = ({ results }: any) => {
     const usd = entries.find((c) => c[0] === "USD");
 
     if (!selectedCurrency || !usd) return;
-    const a: number = usd[1];
-    const b: number = selectedCurrency[1];
+    const a: number = usd[1]
+    const b: number = selectedCurrency[1]
 
     const convertedToUsd = (a / b) * amount;
 
-    const filteredCurrencies = entries.filter(
-      (c) => (b / a) * convertedToUsd > 1000000
+    const newFilteredCurrencies = entries.filter(
+      (c) => (c[1] / a) * convertedToUsd > 1000000
     );
-    setFilteredCurrencies(filteredCurrencies);
+    setFilteredCurrencies(newFilteredCurrencies);
   };
 
   // Convert currencies to countries
@@ -105,7 +105,7 @@ const Home: NextPage = ({ results }: any) => {
       )
     );
   }, [filteredCurrencies]);
-
+  
   return (
     <Container sx={{ padding: "2rem" }}>
       <Head>
@@ -134,7 +134,10 @@ const Home: NextPage = ({ results }: any) => {
             Where are you a <GradientText primary={"Millionaire?"} />
           </Typography>
           <Typography variant="h2">
-            Convert your money to see if it exceeds 1m in any country
+            Convert your money to see if it exceeds 1m in any country <br/><br/>
+          </Typography>
+          <Typography variant="h4" color="gray">
+            {filteredCurrencies.length} countr{filteredCurrencies.length === 1 ? 'y' : 'ies'}
           </Typography>
         </Stack>
 
