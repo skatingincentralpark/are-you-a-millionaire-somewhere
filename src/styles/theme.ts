@@ -18,6 +18,11 @@ const theme = createTheme({
       marginBottom: 0,
     },
     fontFamily: ["Roboto", "Helvetica Neue", "sans-serif"].join(","),
+    body1: {
+      fontFamily: ["Helvetica Neue", "sans-serif"].join(","),
+      fontWeight: 600,
+      // fontSize: "1.2rem",
+    }
   },
   //   palette: {
   //     primary: {

@@ -13,7 +13,6 @@
 
 import { useEffect, useState } from "react";
 import { ComposableMap, Geographies, Geography } from "react-simple-maps";
-
 import { getAllISOByCurrencyOrSymbol } from "iso-country-currency";
 
 const geoUrl =
@@ -22,40 +21,12 @@ const geoUrl =
 const CountriesMap = (props: {
   hasFilteredCurrencies: boolean;
   filteredCurrencies: [string, number][];
+  filteredCountries: string[];
+  isoCountries: string[];
 }) => {
-  const { hasFilteredCurrencies, filteredCurrencies } = props;
-  const [filteredCountries, setFilteredCountries] = useState<string[]>([]);
-
-  useEffect(() => {
-    const currencies = filteredCurrencies.filter((c) => {
-      // iso-country-currency doesn't recognise these
-      if (
-        c[0] === "BYR" ||
-        c[0] === "ZMK" ||
-        c[0] === "LTL" ||
-        c[0] === "MRO" ||
-        c[0] === "SVC" ||
-        c[0] === "CUC" ||
-        c[0] === "GGP" ||
-        c[0] === "IMP" ||
-        c[0] === "BTC" ||
-        c[0] === "JEP" ||
-        c[0] === "LVL" ||
-        c[0] === "XAG" ||
-        c[0] === "XAU" ||
-        c[0] === "XDR" ||
-        c[0] === "CLF"
-      )
-        return;
-      return true;
-    });
-    setFilteredCountries(
-      currencies.flatMap((c) => getAllISOByCurrencyOrSymbol("currency", c[0]))
-    );
-  }, [filteredCurrencies]);
+  const { hasFilteredCurrencies, filteredCurrencies, filteredCountries, isoCountries } = props;
 
   return (
-    <div>
       <ComposableMap
         onClick={() => {
           return;
@@ -72,7 +43,7 @@ const CountriesMap = (props: {
           {({ geographies }) =>
             geographies.map((geo) => {
               const isHighlighted =
-                filteredCountries?.indexOf(geo.properties.ISO_A2) !== -1;
+              isoCountries?.indexOf(geo.properties.ISO_A2) !== -1;
 
               return (
                 <Geography
@@ -86,7 +57,6 @@ const CountriesMap = (props: {
           }
         </Geographies>
       </ComposableMap>
-    </div>
   );
 };
 
